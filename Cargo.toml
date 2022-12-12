@@ -3,7 +3,7 @@ name = "accelduino-rs"
 version = "0.1.0"
 authors = ["katsu <katsu1112uchi@gmail.com>"]
 edition = "2021"
-license = "MIT OR Apache-2.0"
+license = "MIT"
 
 [[bin]]
 name = "accelduino-rs"
@@ -15,6 +15,14 @@ panic-halt = "0.2.0"
 ufmt = "0.1.0"
 nb = "0.1.2"
 embedded-hal = "0.2.3"
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde-json-core = { version = "0.5", default-features = false, features = ["heapless"]}
+quaternion-core = { version = "0.3", default-features = false, features = ["libm"]}
+
+[dependencies.num-traits]
+version = "0.2.15"
+default-features = false
+features = ["libm"]
 
 [dependencies.arduino-hal]
 git = "https://github.com/rahix/avr-hal"
