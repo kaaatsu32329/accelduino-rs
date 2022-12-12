@@ -41,19 +41,10 @@ fn main() -> ! {
         accl_sensor.read_accl();
         let _ = accl_sensor.get_accl();
 
-        ufmt::uwriteln!(
-            &mut serial,
-            "{}, {}, {}",
-            accl_sensor.raw_accl[0],
-            accl_sensor.raw_accl[1],
-            accl_sensor.raw_accl[2]
-        )
-        .void_unwrap();
+        let accl_serde = serde_json_core::to_string::<_, 1024>(&accl_sensor).unwrap();
+        let accl_str = accl_serde.as_str();
 
-        // let imu_serde = serde_json_core::to_string::<_, N>(&imu_data).unwrap();
-        // let imu_str = imu_serde.as_str();
-
-        // ufmt::uwriteln!(&mut serial, "{}", imu_str).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "{}", accl_str).void_unwrap();
 
         hal::delay_ms(1000);
     }
