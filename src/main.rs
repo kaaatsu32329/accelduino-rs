@@ -13,8 +13,6 @@ use traits::{accl::Accl, sensor::Sensor};
 
 use crate::bmx055::Bmx055;
 
-// const N: usize = 1024;
-
 #[hal::entry]
 fn main() -> ! {
     let dp = hal::Peripherals::take().unwrap();
@@ -41,19 +39,11 @@ fn main() -> ! {
         accl_sensor.read_accl();
         let _ = accl_sensor.get_accl();
 
-        ufmt::uwriteln!(
-            &mut serial,
-            "{}, {}, {}",
-            accl_sensor.raw_accl[0],
-            accl_sensor.raw_accl[1],
-            accl_sensor.raw_accl[2]
-        )
-        .void_unwrap();
+        let x = ufmt_float::uFmt_f32::Five(accl_sensor.accl[0]);
+        let y = ufmt_float::uFmt_f32::Five(accl_sensor.accl[1]);
+        let z = ufmt_float::uFmt_f32::Five(accl_sensor.accl[2]);
 
-        // let imu_serde = serde_json_core::to_string::<_, N>(&imu_data).unwrap();
-        // let imu_str = imu_serde.as_str();
-
-        // ufmt::uwriteln!(&mut serial, "{}", imu_str).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "X: {}, Y: {}, Z: {}", x, y, z).void_unwrap();
 
         hal::delay_ms(1000);
     }
