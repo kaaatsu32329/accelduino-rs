@@ -5,6 +5,7 @@ use hal::{prelude::*, I2c};
 use quaternion_core::Vector3;
 use serde::{Deserialize, Serialize};
 
+use crate::traits::madgwick_filter::MadgwickFilter;
 use crate::traits::sensor::Sensor;
 use crate::traits::{accl::Accl, gyro::Gyro, mag::Mag};
 
@@ -38,6 +39,7 @@ pub struct Bmx055 {
     pub raw_gyro: Vector3<i16>,
     pub mag: Vector3<f32>,
     pub raw_mag: Vector3<i16>,
+    sampling_time_ms: Option<u16>,
 }
 
 impl Bmx055 {
@@ -50,6 +52,7 @@ impl Bmx055 {
             raw_gyro: [0i16; 3],
             mag: [0f32; 3],
             raw_mag: [0i16; 3],
+            sampling_time_ms: None,
         }
     }
 }
@@ -190,5 +193,22 @@ impl Mag<f32> for Bmx055 {
 
     fn get_mag(&self) -> Vector3<f32> {
         self.mag
+    }
+}
+
+impl MadgwickFilter<f32> for Bmx055 {
+    fn set_sampling_time(&mut self, time: u16) {
+        self.sampling_time_ms = Some(time);
+    }
+
+    fn raw_vector(&self) -> Vector3<f32> {
+        self.accl
+    }
+
+    fn update(&self) -> Vector3<f32> {
+        match self.sampling_time_ms {
+            None => return self.raw_vector(),
+            Some(t) => return self.calculate(self.raw_vector(), t),
+        }
     }
 }

@@ -2,7 +2,6 @@
 #![no_main]
 
 mod bmx055;
-mod madgwick_filter;
 mod traits;
 
 use arduino_hal as hal;
