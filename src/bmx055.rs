@@ -26,30 +26,30 @@ const GYRO_MODE_BUFFER: [u8; 2] = [0x11, 0x00];
 // const MAG_REP_Z_BUFFER: [u8; 2] = [0x52, 0x16];
 
 const DATA: Range<usize> = 0..6;
-const CORRECTION: f64 = 0.00097656;
+const CORRECTION: f32 = 0.0097656;
 
 #[derive(Deserialize, Serialize)]
 pub struct Bmx055 {
     #[serde(skip)]
     i2c: Option<I2c>,
-    pub accl: Vector3<f64>,
-    pub raw_accl: Vector3<u16>,
-    pub gyro: Vector3<f64>,
-    pub raw_gyro: Vector3<u16>,
-    pub mag: Vector3<f64>,
-    pub raw_mag: Vector3<u16>,
+    pub accl: Vector3<f32>,
+    pub raw_accl: Vector3<i16>,
+    pub gyro: Vector3<f32>,
+    pub raw_gyro: Vector3<i16>,
+    pub mag: Vector3<f32>,
+    pub raw_mag: Vector3<i16>,
 }
 
 impl Bmx055 {
     pub fn new(i2c: I2c) -> Self {
         Self {
             i2c: Some(i2c),
-            accl: [0f64; 3],
-            raw_accl: [0u16; 3],
-            gyro: [0f64; 3],
-            raw_gyro: [0u16; 3],
-            mag: [0f64; 3],
-            raw_mag: [0u16; 3],
+            accl: [0f32; 3],
+            raw_accl: [0i16; 3],
+            gyro: [0f32; 3],
+            raw_gyro: [0i16; 3],
+            mag: [0f32; 3],
+            raw_mag: [0i16; 3],
         }
     }
 }
@@ -142,7 +142,7 @@ impl Sensor for Bmx055 {
     }
 }
 
-impl Accl<f64> for Bmx055 {
+impl Accl<f32> for Bmx055 {
     fn read_accl(&mut self) {
         let mut data = [0u8; 6];
         for i in DATA {
@@ -155,40 +155,40 @@ impl Accl<f64> for Bmx055 {
                 .read(ADDR_ACCL, &mut data[i..i + 1])
                 .unwrap();
         }
-        let x = ((data[1] as u16 * 256) + data[0] as u16) / 16;
-        let y = ((data[3] as u16 * 256) + data[2] as u16) / 16;
-        let z = ((data[5] as u16 * 256) + data[4] as u16) / 16;
+        let x = ((data[1] as i16 * 256) + data[0] as i16) / 16;
+        let y = ((data[3] as i16 * 256) + data[2] as i16) / 16;
+        let z = ((data[5] as i16 * 256) + data[4] as i16) / 16;
 
         self.raw_accl[0] = x;
         self.raw_accl[1] = y;
         self.raw_accl[2] = z;
 
-        self.accl[0] = x as f64 * CORRECTION;
-        self.accl[1] = y as f64 * CORRECTION;
-        self.accl[2] = z as f64 * CORRECTION;
+        self.accl[0] = x as f32 * CORRECTION;
+        self.accl[1] = y as f32 * CORRECTION;
+        self.accl[2] = z as f32 * CORRECTION;
     }
 
-    fn get_accl(&self) -> Vector3<f64> {
+    fn get_accl(&self) -> Vector3<f32> {
         self.accl
     }
 }
 
-impl Gyro<f64> for Bmx055 {
+impl Gyro<f32> for Bmx055 {
     fn read_gyro(&mut self) {
         todo!()
     }
 
-    fn get_gyro(&self) -> Vector3<f64> {
+    fn get_gyro(&self) -> Vector3<f32> {
         self.gyro
     }
 }
 
-impl Mag<f64> for Bmx055 {
+impl Mag<f32> for Bmx055 {
     fn read_mag(&mut self) {
         todo!()
     }
 
-    fn get_mag(&self) -> Vector3<f64> {
+    fn get_mag(&self) -> Vector3<f32> {
         self.mag
     }
 }
