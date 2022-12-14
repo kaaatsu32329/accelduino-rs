@@ -9,7 +9,7 @@ use arduino_hal as hal;
 use panic_halt as _;
 
 use hal::prelude::*;
-use traits::{accl::Accl, sensor::Sensor};
+use traits::{accl::Accl, sensor::Sensor, gyro::Gyro};
 
 use crate::bmx055::Bmx055;
 
@@ -39,11 +39,19 @@ fn main() -> ! {
         accl_sensor.read_accl();
         let _ = accl_sensor.get_accl();
 
-        let x = ufmt_float::uFmt_f32::Five(accl_sensor.accl[0]);
-        let y = ufmt_float::uFmt_f32::Five(accl_sensor.accl[1]);
-        let z = ufmt_float::uFmt_f32::Five(accl_sensor.accl[2]);
+        accl_sensor.read_gyro();
+        let _ = accl_sensor.get_gyro();
 
-        ufmt::uwriteln!(&mut serial, "X: {}, Y: {}, Z: {}", x, y, z).void_unwrap();
+        let accl_x = ufmt_float::uFmt_f32::Five(accl_sensor.accl[0]);
+        let accl_y = ufmt_float::uFmt_f32::Five(accl_sensor.accl[1]);
+        let accl_z = ufmt_float::uFmt_f32::Five(accl_sensor.accl[2]);
+
+        let gyro_x = ufmt_float::uFmt_f32::Five(accl_sensor.gyro[0]);
+        let gyro_y = ufmt_float::uFmt_f32::Five(accl_sensor.gyro[1]);
+        let gyro_z = ufmt_float::uFmt_f32::Five(accl_sensor.gyro[2]);
+
+        ufmt::uwriteln!(&mut serial, "ACCL -> X: {}, Y: {}, Z: {}", accl_x, accl_y, accl_z).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "GYRO -> X: {}, Y: {}, Z: {}", gyro_x, gyro_y, gyro_z).void_unwrap();
 
         hal::delay_ms(1000);
     }
